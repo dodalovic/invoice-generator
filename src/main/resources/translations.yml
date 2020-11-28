@@ -1,0 +1,37 @@
+translations:
+  EN:
+    TAX_NUMBER: Tax number
+    VAT_ID: VAT ID
+    INVOICE: Invoice
+    DESCRIPTION: Description
+    PRICE: Price in EUR
+    SUBTOTAL: Subtotal
+    VAT: VAT
+    TOTAL: Total
+    PLEASE_PAY: "Please, transfer the due amount of %s EUR to the following bank account within the next %s days:"
+    BANK: Bank
+    IBAN: IBAN
+    BIC: BIC
+    THANK_YOU_NOTE: I really appreciate working with your company and look forward to future projects together
+    KIND_REGARDS: Kind regards,
+    COUNTRY: Germany
+    PAYMENT_REASON: Reason for sending money
+    SHOW_COUNTRY: true
+  DE:
+    TAX_NUMBER: Steuernummer
+    VAT_ID: USt-IdNr.
+    INVOICE: Rechnung
+    DESCRIPTION: Beschreibung
+    PRICE: Preis in EUR
+    SUBTOTAL: Zwischensumme
+    VAT: MwSt.
+    TOTAL: Gesammtsumme
+    PLEASE_PAY: "Bitte überweisen Sie die Summe von %s EUR innerhalb von %s Tagen auf das folgende Konto:"
+    BANK: Bank
+    IBAN: IBAN
+    BIC: BIC
+    THANK_YOU_NOTE: Ich bedanke mich für das Vertrauen und freue mich auf die weitere Zusammenarbeit
+    KIND_REGARDS: Mit freundlichen Grüßen,
+    COUNTRY: Deutschland
+    PAYMENT_REASON: Verwendungszweck
+    SHOW_COUNTRY: false

@@ -1,0 +1,22 @@
+personalData:
+  fullName: Max Mustermann
+  address:
+    street: Some street name 33
+    zip: 12345
+    place: Berlin
+  taxNumber: xx/yy/zzzz
+  vatID: DEXXXXXXXXX
+  bank: Some Bank
+  bic: XXXBANKYYYY
+  iban: DEXX XXXX YYYY ZZZZ XXXX YY
+
+invoiceId: My-Client-001
+items:
+  - description:
+      EN: Software development 1
+      DE: Softwareentwicklung 1
+    priceInEur: 10000.00
+  - description:
+      EN: Software development 2
+      DE: Softwareentwicklung 2
+    priceInEur: 5000.00
