@@ -1,4 +1,4 @@
-# Read Makefile
+# invoice-generator
 
 > :information_source: Requires **JDK 8** or newer
 
