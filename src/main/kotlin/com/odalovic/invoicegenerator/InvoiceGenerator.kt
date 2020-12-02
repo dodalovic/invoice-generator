@@ -16,6 +16,8 @@ import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
+import java.time.YearMonth
+import java.time.format.TextStyle
 import java.util.*
 import java.util.concurrent.Callable
 import kotlin.system.exitProcess
@@ -113,8 +115,14 @@ class InvoiceGenerator : Callable<Int> {
             it.showText("${lang["INVOICE"]} #$invoiceNumber")
             it.endText()
 
+            it.beginText()
+            it.newLineAtOffset(50F, pageTop - 295F)
+            it.showTextBoldInline("${lang["PERFORMANCE_PERIOD"]} ")
+            it.showText(performancePeriod(lang))
+            it.endText()
+
             val table = BaseTable(
-                pageTop - 280, 0F, 0F, 510F, 50F, document, page, true,
+                pageTop - 310, 0F, 0F, 510F, 50F, document, page, true,
                 true
             )
             val headerRow = table.createRow(20F)
@@ -176,7 +184,7 @@ class InvoiceGenerator : Callable<Int> {
             table.draw()
 
             it.beginText()
-            it.newLineAtOffset(50F, pageTop - 450F)
+            it.newLineAtOffset(50F, pageTop - 480F)
             it.setFont(regularFont, 11F)
             it.setLeading(20F)
             it.showText(lang["PLEASE_PAY"].format(formattedAmountToPay, 14))
@@ -209,6 +217,13 @@ class InvoiceGenerator : Callable<Int> {
         document.use {
             it.save("$invoiceNumber-$lang.pdf")
         }
+    }
+
+    private fun performancePeriod(lang: String): String {
+        val yearMonthObject = YearMonth.of(config.year, config.month)
+        val daysInMonth = yearMonthObject.lengthOfMonth()
+        val monthDisplayName = yearMonthObject.month.getDisplayName(TextStyle.FULL, Locale.forLanguageTag(lang))
+        return "1 - $daysInMonth $monthDisplayName"
     }
 
     private fun numberFormatter(lang: String) =

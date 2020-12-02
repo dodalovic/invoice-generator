@@ -3,7 +3,13 @@ package com.odalovic.invoicegenerator
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Config(val invoiceId: String, val items: List<Item>, val personalData: PersonalData)
+data class Config(
+    val year: Int,
+    val month: Int,
+    val invoiceId: String,
+    val items: List<Item>,
+    val personalData: PersonalData
+)
 
 @Serializable
 data class PersonalData(
