@@ -11,12 +11,10 @@ personalData:
   iban: DEXX XXXX YYYY ZZZZ XXXX YY
 
 invoiceId: My-Client-001
+year: 2020
+month: 12
 items:
   - description:
       EN: Software development 1
       DE: Softwareentwicklung 1
-    priceInEur: 10000.00
-  - description:
-      EN: Software development 2
-      DE: Softwareentwicklung 2
-    priceInEur: 5000.00
+    priceInEur: 15200.00
