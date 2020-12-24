@@ -13,6 +13,8 @@ personalData:
 invoiceId: My-Client-001
 year: 2020
 month: 12
+vatPercentage: 16
+
 items:
   - description:
       EN: Software development 1

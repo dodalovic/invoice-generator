@@ -155,12 +155,12 @@ class InvoiceGenerator : Callable<Int> {
             val vatRow = table.createRow(10F)
             vatRow.createCell(
                 80F,
-                "${lang["VAT"]} 16%",
+                "${lang["VAT"]} ${config.vatPercentage}%",
                 HorizontalAlignment.RIGHT,
                 VerticalAlignment.MIDDLE
             )
 
-            val vatAmount = subtotal * 16 / 100
+            val vatAmount = subtotal * config.vatPercentage / 100
             vatRow.createCell(20F, numberFormatter(lang).format(vatAmount))
             val totalRow = table.createRow(10F)
 
