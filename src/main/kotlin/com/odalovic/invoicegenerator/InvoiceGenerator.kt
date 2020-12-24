@@ -12,6 +12,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.pdmodel.font.PDType0Font
 import picocli.CommandLine
 import java.awt.Color
+import java.io.File
 import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -33,6 +34,7 @@ class InvoiceGenerator : Callable<Int> {
     private lateinit var regularFont: PDType0Font
     private val numberFormat = "#,##0.00"
     private val today = Date()
+    private val templateFileName = "template.yml"
 
     @CommandLine.Option(
         names = ["-l", "--languages"],
@@ -45,14 +47,48 @@ class InvoiceGenerator : Callable<Int> {
     private lateinit var config: Config
     private lateinit var translations: Translations
 
+    @CommandLine.Option(
+        names = ["--template", "-te"],
+        description = ["An absolute path to a template file used to generate the invoice(s)"]
+    )
+    private var templateFilePath: String = "${System.getProperty("user.home")}/.invoice-generator/${templateFileName}"
+
+    @CommandLine.Option(
+        names = ["--translations", "-tr"],
+        description = ["An absolute path to a translations file used to localize the generated invoice(s)"]
+    )
+    private var translationsFilePath: String = "${System.getProperty("user.home")}/.invoice-generator/translations.yml"
+
+    @CommandLine.Option(
+        names = ["--output-dir", "-o"],
+        required = false,
+        description = ["An absolute path to a directory (with the trailing slash) where the pdf(s) will be generated"]
+    )
+    private var desiredPdfOutputDir: String = "${System.getProperty("user.home")}/.invoice-generator/"
+
+    @CommandLine.Option(
+        names = ["--pdf-name", "-p"],
+        description = ["Name (without .pdf) of file(s) to be generated"]
+    )
+    private var desiredPdfNameWithoutExt: String? = null
+
     override fun call(): Int {
+        initConfigDir()
         config = Yaml.default.decodeFromString(
             Config.serializer(),
-            this::class.java.getResource("/data-template.yml").readText()
+            if (templateFilePath.contains("~")) {
+                File(templateFilePath.replaceFirst("~", System.getProperty("user.home"))).readText()
+            } else {
+                File(templateFilePath).readText()
+            }
         )
         translations = Yaml.default.decodeFromString(
             Translations.serializer(),
-            this::class.java.getResource("/translations.yml").readText()
+            if (translationsFilePath.contains("~")) {
+                File(translationsFilePath.replaceFirst("~", System.getProperty("user.home"))).readText()
+            } else {
+                File(translationsFilePath).readText()
+            }
         )
         for (lang in languages.split(",")) {
             renderPdf(lang)
@@ -187,7 +223,7 @@ class InvoiceGenerator : Callable<Int> {
             it.newLineAtOffset(50F, pageTop - 480F)
             it.setFont(regularFont, 11F)
             it.setLeading(20F)
-            it.showText(lang["PLEASE_PAY"].format(formattedAmountToPay, 14))
+            it.showText(lang["PLEASE_PAY"].format(formattedAmountToPay, config.daysToPay))
             it.newLine()
             it.newLine()
             it.showText(config.personalData.fullName)
@@ -215,8 +251,14 @@ class InvoiceGenerator : Callable<Int> {
 
         }
         document.use {
-            it.save("$invoiceNumber-$lang.pdf")
+            val pdfFullPath = composeGeneratedPdfFullPath(lang)
+            it.save(pdfFullPath).also { println("Successfully generated $pdfFullPath") }
         }
+    }
+
+    private fun composeGeneratedPdfFullPath(lang: String): String {
+        val pdfName = desiredPdfNameWithoutExt?.plus("-$lang.pdf") ?: "$invoiceNumber-$lang.pdf"
+        return "${desiredPdfOutputDir}${pdfName}"
     }
 
     private fun performancePeriod(lang: String): String {
@@ -231,6 +273,26 @@ class InvoiceGenerator : Callable<Int> {
 
     private fun englishNumberFormatter() =
         (NumberFormat.getNumberInstance(Locale.forLanguageTag("EN")) as DecimalFormat).apply { applyPattern(numberFormat) }
+
+    private fun initConfigDir() {
+        val templateDir = File("${System.getProperty("user.home")}/.invoice-generator")
+        if (!templateDir.exists()) {
+            templateDir.mkdirs()
+            println("Config directory created: (${templateDir.absolutePath})")
+        }
+        val templateFileInConfigDir = File("${templateDir.absolutePath}/template.yml")
+        if (!templateFileInConfigDir.exists()) {
+            val templateContent = this::class.java.getResource("/template.yml").readText()
+            templateFileInConfigDir.writeText(templateContent)
+            println("Created non-existing template ${templateFileInConfigDir.absolutePath}")
+        }
+        val translationsFileInConfigDir = File("${templateDir.absolutePath}/translations.yml")
+        if (!translationsFileInConfigDir.exists()) {
+            val translationsContent = this::class.java.getResource("/translations.yml").readText()
+            translationsFileInConfigDir.writeText(translationsContent)
+            println("Created non-existing translations file ${translationsFileInConfigDir.absolutePath}")
+        }
+    }
 
     private fun initFonts(doc: PDDocument) {
         boldFont =

@@ -8,6 +8,7 @@ data class Config(
     val month: Int,
     val invoiceId: String,
     val vatPercentage: Byte,
+    val daysToPay: Byte = 14,
     val items: List<Item>,
     val personalData: PersonalData
 )

@@ -8,15 +8,48 @@
 
 ## How to execute it?
 
-1. `make build-jar`
+* `make build-jar`
     
     * :information_source: Rebuilds the executable (`.jar`) file from project sources
-2. `make make-pdf LANG=EN,DE`
+* `make generate`
     
-    * :information_source: Runs the executable to produce PDF(s) in desired language(s). PDFs are generated in the project root
-    * You can specify languages as comma delimited list, examples: `EN` or `EN,DE`
-    
-## Use own data
+    * :information_source: Runs the executable to produce PDF(s) in desired language(s)
 
-* Adjust `src/main/resources/data-template.yml` to use own data
-* Adjust `src/main/resources/translations.yml` to change translations
+## Command line options
+
+* `--template` or `-te`
+
+  [OPTIONAL] An absolute path to a template file used to generate the invoice(s)
+  
+  If not specified, defaults to `${user.home}/invoice-generator/template.yml`
+  
+* `--translations` or `-tr`
+
+  [OPTIONAL] An absolute path to a translations file used to localize the generated invoice(s)
+
+  If not specified, defaults to `${user.home}/invoice-generator/translations.yml`
+  
+* `--output-dir` or `-o`
+
+  [OPTIONAL] An absolute path to a directory (with the trailing slash) where the pdf(s) will be generated
+
+  If not specified, defaults to `${user.home}/invoice-generator/`
+  
+* `--pdf-name` or `-p`
+
+  [OPTIONAL] Name (without `.pdf`) of file(s) to be generated
+
+  If not specified, defaults to `$invoiceNumber-$lang.pdf`
+
+* `--languages` or `-l`
+
+  Comma delimited list of languages to generate invoice in, example `EN,DE`
+
+  [OPTIONAL] Defaults to `EN`
+
+## Examples
+
+```shell
+$ make generate
+$ make generate ARGS="-o /home/my-user/Desktop/ -p my-invoice-name -te /home/my-user/template-to-use.yml -tr /home/my-user/translations-to-use.yml" 
+```

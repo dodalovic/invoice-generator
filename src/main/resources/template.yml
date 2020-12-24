@@ -14,6 +14,7 @@ invoiceId: My-Client-001
 year: 2020
 month: 12
 vatPercentage: 16
+daysToPay: 14
 
 items:
   - description:
