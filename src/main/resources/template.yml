@@ -1,23 +1,42 @@
 personalData:
+  # Your full name
   fullName: Max Mustermann
+  # Your address name
   address:
+    # Street and number
     street: Some street name 33
+    # Zip code
     zip: 12345
+    # City / Place
     place: Berlin
+  # Your tax number
   taxNumber: xx/yy/zzzz
+  # Your Vat ID
   vatID: DEXXXXXXXXX
+  # Your bank name
   bank: Some Bank
+  # Your bank BIC
   bic: XXXBANKYYYY
+  # Your IBAN
   iban: DEXX XXXX YYYY ZZZZ XXXX YY
 
+# Unique invoice identifier
 invoiceId: My-Client-001
+# Year of invoice
 year: 2020
+# Month of invoice
 month: 12
+# Vat percentage to be used for calculations
 vatPercentage: 16
+# Days to allow the invoice to be payed
 daysToPay: 14
 
+# Billable items
 items:
   - description:
+      # English translation
       EN: Software development 1
+      # German translation
       DE: Softwareentwicklung 1
+    # Item price
     priceInEur: 15200.00
