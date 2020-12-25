@@ -1,9 +1,11 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
-    kotlin("jvm") version "1.4.10"
-    kotlin("kapt") version "1.4.10"
-    id("com.github.johnrengelman.shadow") version "5.1.0"
-    kotlin("plugin.serialization") version "1.4.10"
+    val kotlinVersion = "1.4.21"
+    kotlin("jvm") version kotlinVersion
+    kotlin("kapt") version kotlinVersion
+    id("com.github.johnrengelman.shadow") version "5.2.0"
+    kotlin("plugin.serialization") version kotlinVersion
 }
 
 group = "com.odalovic"
@@ -18,7 +20,7 @@ dependencies {
     implementation("info.picocli:picocli:4.5.2")
     annotationProcessor("info.picocli:picocli-codegen:4.5.2")
     kapt("info.picocli:picocli-codegen:4.5.2")
-    implementation("org.apache.pdfbox:pdfbox:2.0.21")
+    implementation("org.apache.pdfbox:pdfbox:2.0.22")
     implementation("com.github.dhorions:boxable:1.6")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
     implementation("com.charleskorn.kaml:kaml:0.26.0")
