@@ -236,7 +236,7 @@ class InvoiceGenerator : Callable<Int> {
 
             it.newLineAtOffset(50F, pageTop - 50F)
 
-            it.showTextBoldInline("Client invoice address:")
+            it.showTextBoldInline("${lang["CLIENT_INVOICE_ADDRESS"]}:")
             it.newLine()
             it.showText(client.companyDetails.name)
             it.newLine()
@@ -244,7 +244,7 @@ class InvoiceGenerator : Callable<Int> {
             it.newLine()
             it.showText("${client.companyDetails.invoiceAddress.zip} ${client.companyDetails.invoiceAddress.place}")
             it.newLine()
-            it.showTextBoldInline("VAT ID ")
+            it.showTextBoldInline("${lang["VAT_ID"]} ")
             it.showText(client.companyDetails.vatId)
             it.endText()
         }
@@ -263,7 +263,8 @@ class InvoiceGenerator : Callable<Int> {
         val yearMonthObject = YearMonth.of(client.year, client.month)
         val daysInMonth = yearMonthObject.lengthOfMonth()
         val monthDisplayName = yearMonthObject.month.getDisplayName(TextStyle.FULL, Locale.forLanguageTag(lang))
-        return "1 - $daysInMonth $monthDisplayName"
+        val yearDisplayName = yearMonthObject.year
+        return "1 - $daysInMonth $monthDisplayName $yearDisplayName"
     }
 
     private fun numberFormatter(lang: String) =

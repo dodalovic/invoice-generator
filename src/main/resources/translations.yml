@@ -18,6 +18,7 @@ translations:
     PAYMENT_REASON: Reason for sending money
     SHOW_COUNTRY: true
     PERFORMANCE_PERIOD: Performance period
+    CLIENT_INVOICE_ADDRESS: Client invoice address
   DE:
     TAX_NUMBER: Steuernummer
     VAT_ID: USt-IdNr.
@@ -37,3 +38,4 @@ translations:
     PAYMENT_REASON: Verwendungszweck
     SHOW_COUNTRY: false
     PERFORMANCE_PERIOD: Leistungszeitraum
+    CLIENT_INVOICE_ADDRESS: Rechnungsadresse des Kunden
