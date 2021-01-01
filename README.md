@@ -14,27 +14,11 @@
 * `make generate`
     
     * :information_source: Runs the executable to produce PDF(s) in desired language(s)
+    
+      A console will print out location of generated file(s) 
 
 ## Command line options
 
-* `--template` or `-te`
-
-  [OPTIONAL] An absolute path to a template file used to generate the invoice(s)
-  
-  If not specified, defaults to `${user.home}/invoice-generator/template.yml`
-  
-* `--translations` or `-tr`
-
-  [OPTIONAL] An absolute path to a translations file used to localize the generated invoice(s)
-
-  If not specified, defaults to `${user.home}/invoice-generator/translations.yml`
-  
-* `--output-dir` or `-o`
-
-  [OPTIONAL] An absolute path to a directory (with the trailing slash) where the pdf(s) will be generated
-
-  If not specified, defaults to `${user.home}/invoice-generator/`
-  
 * `--pdf-name` or `-p`
 
   [OPTIONAL] Name (without `.pdf`) of file(s) to be generated
@@ -50,6 +34,8 @@
 ## Examples
 
 ```shell
+# Generated using sane defaults
 $ make generate
-$ make generate ARGS="-o /home/my-user/Desktop/ -p my-invoice-name -te /home/my-user/template-to-use.yml -tr /home/my-user/translations-to-use.yml" 
+# Specify generated PDF name
+$ make generate ARGS="-p my-invoice-name" 
 ```

@@ -1,0 +1,20 @@
+# Your full name
+fullName: Max Mustermann
+# Your address name
+address:
+  # Street and number
+  street: Some street name 33
+  # Zip code
+  zip: 12345
+  # City / Place
+  place: Berlin
+# Your tax number
+taxNumber: xx/yy/zzzz
+# Your Vat ID
+vatID: DEXXXXXXXXX
+# Your bank name
+bank: Some Bank
+# Your bank BIC
+bic: XXXBANKYYYY
+# Your IBAN
+iban: DEXX XXXX YYYY ZZZZ XXXX YY

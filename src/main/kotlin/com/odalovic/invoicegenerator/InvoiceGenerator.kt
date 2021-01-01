@@ -12,7 +12,6 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.pdmodel.font.PDType0Font
 import picocli.CommandLine
 import java.awt.Color
-import java.io.File
 import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -34,7 +33,6 @@ class InvoiceGenerator : Callable<Int> {
     private lateinit var regularFont: PDType0Font
     private val numberFormat = "#,##0.00"
     private val today = Date()
-    private val templateFileName = "template.yml"
 
     @CommandLine.Option(
         names = ["-l", "--languages"],
@@ -44,27 +42,9 @@ class InvoiceGenerator : Callable<Int> {
 
     private lateinit var invoiceNumber: String
 
-    private lateinit var config: Config
+    private lateinit var me: Me
+    private lateinit var client: Client
     private lateinit var translations: Translations
-
-    @CommandLine.Option(
-        names = ["--template", "-te"],
-        description = ["An absolute path to a template file used to generate the invoice(s)"]
-    )
-    private var templateFilePath: String = "${System.getProperty("user.home")}/.invoice-generator/${templateFileName}"
-
-    @CommandLine.Option(
-        names = ["--translations", "-tr"],
-        description = ["An absolute path to a translations file used to localize the generated invoice(s)"]
-    )
-    private var translationsFilePath: String = "${System.getProperty("user.home")}/.invoice-generator/translations.yml"
-
-    @CommandLine.Option(
-        names = ["--output-dir", "-o"],
-        required = false,
-        description = ["An absolute path to a directory (with the trailing slash) where the pdf(s) will be generated"]
-    )
-    private var desiredPdfOutputDir: String = "${System.getProperty("user.home")}/.invoice-generator/"
 
     @CommandLine.Option(
         names = ["--pdf-name", "-p"],
@@ -73,23 +53,10 @@ class InvoiceGenerator : Callable<Int> {
     private var desiredPdfNameWithoutExt: String? = null
 
     override fun call(): Int {
-        initConfigDir()
-        config = Yaml.default.decodeFromString(
-            Config.serializer(),
-            if (templateFilePath.contains("~")) {
-                File(templateFilePath.replaceFirst("~", System.getProperty("user.home"))).readText()
-            } else {
-                File(templateFilePath).readText()
-            }
-        )
-        translations = Yaml.default.decodeFromString(
-            Translations.serializer(),
-            if (translationsFilePath.contains("~")) {
-                File(translationsFilePath.replaceFirst("~", System.getProperty("user.home"))).readText()
-            } else {
-                File(translationsFilePath).readText()
-            }
-        )
+        Config.init()
+        me = Yaml.default.decodeFromString(Me.serializer(), Config.loadMeConfig())
+        client = Yaml.default.decodeFromString(Client.serializer(), Config.loadClientConfig())
+        translations = Yaml.default.decodeFromString(Translations.serializer(), Config.loadTranslationsConfig())
         for (lang in languages.split(",")) {
             renderPdf(lang)
         }
@@ -107,10 +74,10 @@ class InvoiceGenerator : Callable<Int> {
             it.beginText()
             it.setFont(boldFont, 12F)
             it.newLineAtOffset(50F, pageTop)
-            it.showText("${config.personalData.fullName} • ")
+            it.showText("${me.fullName} • ")
             it.setFont(regularFont, 11F)
-            it.showText("${config.personalData.address.street} • ")
-            val cityZip = "${config.personalData.address.zip} ${config.personalData.address.place}"
+            it.showText("${me.address.street} • ")
+            val cityZip = "${me.address.zip} ${me.address.place}"
             it.showText(cityZip)
             it.endText()
 
@@ -119,9 +86,9 @@ class InvoiceGenerator : Callable<Int> {
 
             it.newLineAtOffset(50F, pageTop - 50F)
 
-            it.showText(config.personalData.fullName)
+            it.showText(me.fullName)
             it.newLine()
-            it.showText(config.personalData.address.street)
+            it.showText(me.address.street)
             it.newLine()
             it.showText(cityZip)
             it.newLine()
@@ -132,22 +99,22 @@ class InvoiceGenerator : Callable<Int> {
             }
             it.newLine()
             it.showTextBoldInline("${lang["TAX_NUMBER"]} ")
-            it.showText(config.personalData.taxNumber)
+            it.showText(me.taxNumber)
             it.newLine()
             it.showTextBoldInline("${lang["VAT_ID"]} ")
-            it.showText(config.personalData.vatID)
+            it.showText(me.vatID)
             it.endText()
 
             it.beginText()
             it.newLineAtOffset(425F, pageTop - 270F)
-            it.showText("${config.personalData.address.place}, ${lang.longDate()}")
+            it.showText("${me.address.place}, ${lang.longDate()}")
             it.endText()
 
             it.beginText()
             it.newLineAtOffset(50F, pageTop - 270F)
             it.setFont(boldFont, 18F)
             val prefixInvoice = SimpleDateFormat("yyyyMMdd").format(today)
-            invoiceNumber = "$prefixInvoice-${config.invoiceId}"
+            invoiceNumber = "$prefixInvoice-${client.invoiceId}"
             it.showText("${lang["INVOICE"]} #$invoiceNumber")
             it.endText()
 
@@ -167,7 +134,7 @@ class InvoiceGenerator : Callable<Int> {
             val pricesCell = headerRow.createCell(20F, lang["PRICE"])
             pricesCell.font = boldFont
             table.addHeaderRow(headerRow)
-            for (item in config.items) {
+            for (item in client.items) {
                 val row = table.createRow(10f)
                 row.createCell(80F, item.description.getValue(lang))
                 val parsed = englishNumberFormatter().parse(item.priceInEur)
@@ -184,19 +151,19 @@ class InvoiceGenerator : Callable<Int> {
                 HorizontalAlignment.RIGHT,
                 VerticalAlignment.MIDDLE
             )
-            val subtotal = config.items
+            val subtotal = client.items
                 .sumByDouble { item -> englishNumberFormatter().parse(item.priceInEur).toDouble() }
             subtotalRow.createCell(20F, numberFormatter(lang).format(subtotal).toString())
 
             val vatRow = table.createRow(10F)
             vatRow.createCell(
                 80F,
-                "${lang["VAT"]} ${config.vatPercentage}%",
+                "${lang["VAT"]} ${client.vatPercentage}%",
                 HorizontalAlignment.RIGHT,
                 VerticalAlignment.MIDDLE
             )
 
-            val vatAmount = subtotal * config.vatPercentage / 100
+            val vatAmount = subtotal * client.vatPercentage / 100
             vatRow.createCell(20F, numberFormatter(lang).format(vatAmount))
             val totalRow = table.createRow(10F)
 
@@ -223,19 +190,19 @@ class InvoiceGenerator : Callable<Int> {
             it.newLineAtOffset(50F, pageTop - 480F)
             it.setFont(regularFont, 11F)
             it.setLeading(20F)
-            it.showText(lang["PLEASE_PAY"].format(formattedAmountToPay, config.daysToPay))
+            it.showText(lang["PLEASE_PAY"].format(formattedAmountToPay, client.daysToPay))
             it.newLine()
             it.newLine()
-            it.showText(config.personalData.fullName)
+            it.showText(me.fullName)
             it.newLine()
             it.showTextBoldInline("${lang["BANK"]} ")
-            it.showText(config.personalData.bank)
+            it.showText(me.bank)
             it.newLine()
             it.showTextBoldInline("${lang["IBAN"]} ")
-            it.showText(config.personalData.iban)
+            it.showText(me.iban)
             it.newLine()
             it.showTextBoldInline("${lang["BIC"]} ")
-            it.showText(config.personalData.bic)
+            it.showText(me.bic)
             it.newLine()
             it.showTextBoldInline("${lang["PAYMENT_REASON"]} ")
             it.showText(invoiceNumber)
@@ -246,7 +213,7 @@ class InvoiceGenerator : Callable<Int> {
             it.newLine()
             it.showText(lang["KIND_REGARDS"])
             it.newLine()
-            it.showText(config.personalData.fullName)
+            it.showText(me.fullName)
             it.endText()
 
         }
@@ -258,11 +225,11 @@ class InvoiceGenerator : Callable<Int> {
 
     private fun composeGeneratedPdfFullPath(lang: String): String {
         val pdfName = desiredPdfNameWithoutExt?.plus("-$lang.pdf") ?: "$invoiceNumber-$lang.pdf"
-        return "${desiredPdfOutputDir}${pdfName}"
+        return "${Config.CONFIG_DIR}/$pdfName"
     }
 
     private fun performancePeriod(lang: String): String {
-        val yearMonthObject = YearMonth.of(config.year, config.month)
+        val yearMonthObject = YearMonth.of(client.year, client.month)
         val daysInMonth = yearMonthObject.lengthOfMonth()
         val monthDisplayName = yearMonthObject.month.getDisplayName(TextStyle.FULL, Locale.forLanguageTag(lang))
         return "1 - $daysInMonth $monthDisplayName"
@@ -273,26 +240,6 @@ class InvoiceGenerator : Callable<Int> {
 
     private fun englishNumberFormatter() =
         (NumberFormat.getNumberInstance(Locale.forLanguageTag("EN")) as DecimalFormat).apply { applyPattern(numberFormat) }
-
-    private fun initConfigDir() {
-        val templateDir = File("${System.getProperty("user.home")}/.invoice-generator")
-        if (!templateDir.exists()) {
-            templateDir.mkdirs()
-            println("Config directory created: (${templateDir.absolutePath})")
-        }
-        val templateFileInConfigDir = File("${templateDir.absolutePath}/template.yml")
-        if (!templateFileInConfigDir.exists()) {
-            val templateContent = this::class.java.getResource("/template.yml").readText()
-            templateFileInConfigDir.writeText(templateContent)
-            println("Created non-existing template ${templateFileInConfigDir.absolutePath}")
-        }
-        val translationsFileInConfigDir = File("${templateDir.absolutePath}/translations.yml")
-        if (!translationsFileInConfigDir.exists()) {
-            val translationsContent = this::class.java.getResource("/translations.yml").readText()
-            translationsFileInConfigDir.writeText(translationsContent)
-            println("Created non-existing translations file ${translationsFileInConfigDir.absolutePath}")
-        }
-    }
 
     private fun initFonts(doc: PDDocument) {
         boldFont =
