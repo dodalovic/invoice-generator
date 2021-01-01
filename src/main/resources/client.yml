@@ -9,6 +9,21 @@ vatPercentage: 16
 # Days to allow the invoice to be payed
 daysToPay: 14
 
+# Appears on the second page of the generated invoice(s)
+companyDetails:
+  # Company legal name
+  name: Company name GmbH
+  # Company invoicing details
+  invoiceAddress:
+    # Address line 1
+    line1: Some-Street. 1-3
+    # Zip code
+    zip: 12345
+    # Place
+    place: Berlin
+  # Company VAT ID
+  vatId: DEXXXYYYZZZ
+
 # Billable items
 items:
   - description:

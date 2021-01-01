@@ -52,6 +52,8 @@ class InvoiceGenerator : Callable<Int> {
     )
     private var desiredPdfNameWithoutExt: String? = null
 
+    private val pageTop = 730F
+
     override fun call(): Int {
         Config.init()
         me = Yaml.default.decodeFromString(Me.serializer(), Config.loadMeConfig())
@@ -66,11 +68,12 @@ class InvoiceGenerator : Callable<Int> {
     private fun renderPdf(lang: String) {
         val document = PDDocument()
         initFonts(document)
-        val page = PDPage()
-        document.addPage(page)
+        val firstPage = PDPage()
+        val secondPage = PDPage()
+        document.addPage(firstPage)
+        document.addPage(secondPage)
 
-        PDPageContentStream(document, page).use {
-            val pageTop = 730F
+        PDPageContentStream(document, firstPage).use {
             it.beginText()
             it.setFont(boldFont, 12F)
             it.newLineAtOffset(50F, pageTop)
@@ -125,7 +128,7 @@ class InvoiceGenerator : Callable<Int> {
             it.endText()
 
             val table = BaseTable(
-                pageTop - 310, 0F, 0F, 510F, 50F, document, page, true,
+                pageTop - 310, 0F, 0F, 510F, 50F, document, firstPage, true,
                 true
             )
             val headerRow = table.createRow(20F)
@@ -216,6 +219,34 @@ class InvoiceGenerator : Callable<Int> {
             it.showText(me.fullName)
             it.endText()
 
+        }
+        PDPageContentStream(document, secondPage).use {
+            it.beginText()
+            it.setFont(boldFont, 12F)
+            it.newLineAtOffset(50F, pageTop)
+            it.showText("${me.fullName} • ")
+            it.setFont(regularFont, 11F)
+            it.showText("${me.address.street} • ")
+            val cityZip = "${me.address.zip} ${me.address.place}"
+            it.showText(cityZip)
+            it.endText()
+
+            it.beginText()
+            it.setLeading(20F)
+
+            it.newLineAtOffset(50F, pageTop - 50F)
+
+            it.showTextBoldInline("Client invoice address:")
+            it.newLine()
+            it.showText(client.companyDetails.name)
+            it.newLine()
+            it.showText(client.companyDetails.invoiceAddress.line1)
+            it.newLine()
+            it.showText("${client.companyDetails.invoiceAddress.zip} ${client.companyDetails.invoiceAddress.place}")
+            it.newLine()
+            it.showTextBoldInline("VAT ID ")
+            it.showText(client.companyDetails.vatId)
+            it.endText()
         }
         document.use {
             val pdfFullPath = composeGeneratedPdfFullPath(lang)
