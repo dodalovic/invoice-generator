@@ -20,10 +20,10 @@ dependencies {
     implementation("info.picocli:picocli:4.5.2")
     annotationProcessor("info.picocli:picocli-codegen:4.5.2")
     kapt("info.picocli:picocli-codegen:4.5.2")
-    implementation("org.apache.pdfbox:pdfbox:2.0.22")
-    implementation("com.github.dhorions:boxable:1.6")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
     implementation("com.charleskorn.kaml:kaml:0.26.0")
+    implementation("org.asciidoctor:asciidoctorj:2.4.2")
+    implementation("org.asciidoctor:asciidoctorj-pdf:1.5.3")
 }
 
 kapt {
