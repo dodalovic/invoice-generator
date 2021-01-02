@@ -60,9 +60,10 @@ class InvoiceGenerator : Callable<Int> {
         val prefixInvoice = SimpleDateFormat("yyyyMMdd").format(Date())
         invoiceNumber = "$prefixInvoice-${client.invoiceId}"
 
+        val generatedPdfFullPath = composeGeneratedPdfFullPath(lang)
         val options = options()
             .inPlace(true)
-            .toFile(File("/home/dodalovic/Downloads/myinvoice.pdf"))
+            .toFile(File(generatedPdfFullPath))
             .safe(SafeMode.UNSAFE)
             .backend("pdf")
             .asMap()
@@ -76,20 +77,15 @@ class InvoiceGenerator : Callable<Int> {
             """
             :nofooter:
             
-            
             pass:a,q[*${me.fullName}*] • ${me.address.street} • ${me.address.zip} ${me.address.place}
             
             :hardbreaks:
              
             
             ${me.fullName}
-            
             ${me.address.street}
-            
             ${me.address.zip} ${me.address.place}
-            
             pass:a,q[*${lang["TAX_NUMBER"]}*] ${me.taxNumber}
-            
             pass:a,q[*${lang["VAT_ID"]}*] ${me.vatID}
             
             :hardbreaks:
@@ -98,10 +94,12 @@ class InvoiceGenerator : Callable<Int> {
             
             [cols="<,>",frame=none,grid=none]
             |===
-            | *${lang["INVOICE"]}* $invoiceNumber | ${me.address.place}, ${lang.longDate()}
+            |*${lang["INVOICE"]}* $invoiceNumber | ${me.address.place}, ${lang.longDate()}
             |===
             
-            [subs="attributes+,verbatim",options=header]
+            *${lang["PERFORMANCE_PERIOD"]}* ${performancePeriod(lang)}
+            
+            [cols="70,30",subs="attributes+,verbatim",options=header]
             |===
             | ${lang["DESCRIPTION"]} | ${lang["PRICE"]}
             ${
@@ -114,9 +112,9 @@ class InvoiceGenerator : Callable<Int> {
                 })
             }
             | {nbsp} | {nbsp}
-            | *${lang["SUBTOTAL"]}* | ${numberFormatter(lang).format(subtotal)}
-            | *${lang["VAT"]} ${client.vatPercentage}%* | ${numberFormatter(lang).format(vatAmount)}
-            | *${lang["TOTAL"]}* | $formattedAmountToPay
+            >| *${lang["SUBTOTAL"]}* | ${numberFormatter(lang).format(subtotal)}
+            >| *${lang["VAT"]} ${client.vatPercentage}%* | ${numberFormatter(lang).format(vatAmount)}
+            >| *${lang["TOTAL"]}* | $formattedAmountToPay
             |===
             
             
@@ -165,7 +163,7 @@ class InvoiceGenerator : Callable<Int> {
             *${lang["VAT_ID"]}* ${client.companyDetails.vatId}
             
         """.trimIndent(), options
-        )
+        ).also { println("Generated invoice $generatedPdfFullPath") }
     }
 
     private fun composeGeneratedPdfFullPath(lang: String): String {
