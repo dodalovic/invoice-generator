@@ -119,8 +119,6 @@ class InvoiceGenerator : Callable<Int> {
             | *${lang["TOTAL"]}* | $formattedAmountToPay
             |===
             
-            :hardbreaks:
-             
             
             ${lang["PLEASE_PAY"].format(formattedAmountToPay, client.daysToPay)}
             
@@ -147,12 +145,11 @@ class InvoiceGenerator : Callable<Int> {
              
             
             ${lang["KIND_REGARDS"]}
-            
             ${me.fullName}
             
             <<< 
             
-            pass:a,q[*${me.fullName}*] • ${me.address.street} • {ZIP} {PLACE}
+            pass:a,q[*${me.fullName}*] • ${me.address.street} • ${me.address.zip} ${me.address.place}
             
             :hardbreaks:
              
