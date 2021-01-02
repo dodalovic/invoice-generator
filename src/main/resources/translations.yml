@@ -8,7 +8,7 @@ translations:
     SUBTOTAL: Subtotal
     VAT: VAT
     TOTAL: Total
-    PLEASE_PAY: "Please, transfer the due amount of %s EUR to the following bank account within the next %s days:"
+    PLEASE_PAY: "Please, transfer the due amount of *%s* EUR to the following bank account within the next %s days:"
     BANK: Bank
     IBAN: IBAN
     BIC: BIC
@@ -28,7 +28,7 @@ translations:
     SUBTOTAL: Zwischensumme
     VAT: MwSt.
     TOTAL: Gesammtsumme
-    PLEASE_PAY: "Bitte überweisen Sie die Summe von %s EUR innerhalb von %s Tagen auf das folgende Konto:"
+    PLEASE_PAY: "Bitte überweisen Sie die Summe von *%s* EUR innerhalb von %s Tagen auf das folgende Konto:"
     BANK: Bank
     IBAN: IBAN
     BIC: BIC
