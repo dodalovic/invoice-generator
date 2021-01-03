@@ -1,9 +1,7 @@
 package com.odalovic.invoicegenerator
 
 import com.charleskorn.kaml.Yaml
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.asciidoctor.Asciidoctor.Factory.create
 import org.asciidoctor.OptionsBuilder.options
 import org.asciidoctor.SafeMode
@@ -49,13 +47,26 @@ class InvoiceGenerator : Callable<Int> {
 
     override fun call(): Int {
         Config.init()
-        me = Yaml.default.decodeFromString(Me.serializer(), Config.loadMeConfig())
-        client = Yaml.default.decodeFromString(Client.serializer(), Config.loadClientConfig())
-        translations = Yaml.default.decodeFromString(Translations.serializer(), Config.loadTranslationsConfig())
         runBlocking {
-            for (lang in languages.split(",")) {
-                launch(Dispatchers.Default) {
-                    renderPdf(lang)
+            coroutineScope {
+                val meConfigLoader = async(Dispatchers.IO) {
+                    Yaml.default.decodeFromString(Me.serializer(), Config.loadMeConfig())
+                }
+                val clientConfigLoader = async(Dispatchers.IO) {
+                    Yaml.default.decodeFromString(Client.serializer(), Config.loadClientConfig())
+                }
+                val translationsConfigLoader = async(Dispatchers.IO) {
+                    Yaml.default.decodeFromString(Translations.serializer(), Config.loadTranslationsConfig())
+                }
+                me = meConfigLoader.await()
+                client = clientConfigLoader.await()
+                translations = translationsConfigLoader.await()
+            }
+            coroutineScope {
+                for (lang in languages.split(",")) {
+                    launch(Dispatchers.Default) {
+                        renderPdf(lang)
+                    }
                 }
             }
         }
