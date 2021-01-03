@@ -84,7 +84,7 @@ class InvoiceGenerator : Callable<Int> {
             """
             :nofooter:
             
-            pass:a,q[*${me.fullName}*] • ${me.address.street} • ${me.address.zip} ${me.address.place}
+            *${me.fullName}* • ${me.address.street} • ${me.address.zip} ${me.address.place}
             
             :hardbreaks:
              
@@ -92,8 +92,8 @@ class InvoiceGenerator : Callable<Int> {
             ${me.fullName}
             ${me.address.street}
             ${me.address.zip} ${me.address.place}
-            pass:a,q[*${lang["TAX_NUMBER"]}*] ${me.taxNumber}
-            pass:a,q[*${lang["VAT_ID"]}*] ${me.vatID}
+            *${lang["TAX_NUMBER"]}* ${me.taxNumber}
+            *${lang["VAT_ID"]}* ${me.vatID}
             
             :hardbreaks:
              
@@ -154,7 +154,7 @@ class InvoiceGenerator : Callable<Int> {
             
             <<< 
             
-            pass:a,q[*${me.fullName}*] • ${me.address.street} • ${me.address.zip} ${me.address.place}
+            *${me.fullName}* • ${me.address.street} • ${me.address.zip} ${me.address.place}
             
             :hardbreaks:
              
