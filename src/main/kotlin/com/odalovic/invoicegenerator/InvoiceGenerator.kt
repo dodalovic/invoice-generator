@@ -1,6 +1,9 @@
 package com.odalovic.invoicegenerator
 
 import com.charleskorn.kaml.Yaml
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.asciidoctor.Asciidoctor.Factory.create
 import org.asciidoctor.OptionsBuilder.options
 import org.asciidoctor.SafeMode
@@ -49,8 +52,12 @@ class InvoiceGenerator : Callable<Int> {
         me = Yaml.default.decodeFromString(Me.serializer(), Config.loadMeConfig())
         client = Yaml.default.decodeFromString(Client.serializer(), Config.loadClientConfig())
         translations = Yaml.default.decodeFromString(Translations.serializer(), Config.loadTranslationsConfig())
-        for (lang in languages.split(",")) {
-            renderPdf(lang)
+        runBlocking {
+            for (lang in languages.split(",")) {
+                launch(Dispatchers.Default) {
+                    renderPdf(lang)
+                }
+            }
         }
         return 0
     }

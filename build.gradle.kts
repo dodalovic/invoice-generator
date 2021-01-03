@@ -13,6 +13,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
@@ -24,6 +25,7 @@ dependencies {
     implementation("com.charleskorn.kaml:kaml:0.26.0")
     implementation("org.asciidoctor:asciidoctorj:2.4.2")
     implementation("org.asciidoctor:asciidoctorj-pdf:1.5.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
 }
 
 kapt {
